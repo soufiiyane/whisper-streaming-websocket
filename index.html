@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper Live</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .start-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .start-btn:hover {
+            background-color: #45a049;
+        }
+
+        .stop-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .stop-btn:hover {
+            background-color: #da190b;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .status.listening {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .transcript {
+            min-height: 150px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+            font-size: 16px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .voice-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .voice-indicator.active {
+            background-color: #4CAF50;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .server-input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎤 Whisper Live Transcription</h1>
+
+        <div class="controls">
+            <button id="recordBtn" class="start-btn">🎤 Start Recording</button>
+            <input type="text" id="serverUrl" class="server-input" value="ws://localhost:43007"
+                placeholder="WebSocket URL">
+            <span>Voice: <span class="voice-indicator" id="voiceIndicator"></span></span>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+        <div id="transcript" class="transcript">Click "Start Recording" to begin transcription...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hark@1.2.3/hark.bundle.js"></script>
+    <script>
+        class WhisperClient {
+            constructor() {
+                this.socket = null;
+                this.isRecording = false;
+                this.audioContext = null;
+                this.speechEvents = null;
+                this.transcriptText = '';
+
+                this.recordBtn = document.getElementById('recordBtn');
+                this.serverUrl = document.getElementById('serverUrl');
+                this.status = document.getElementById('status');
+                this.transcript = document.getElementById('transcript');
+                this.voiceIndicator = document.getElementById('voiceIndicator');
+
+                this.recordBtn.addEventListener('click', () => this.toggleRecording());
+            }
+
+            async toggleRecording() {
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    await this.startRecording();
+                }
+            }
+
+            async startRecording() {
+                try {
+                    // Connect to WebSocket
+                    this.socket = new WebSocket(this.serverUrl.value);
+
+                    this.socket.onopen = () => {
+                        this.showStatus('🔗 Connected to Whisper server', 'listening');
+                        // Send start message
+                        this.socket.send(JSON.stringify({ type: 'start' }));
+                    };
+
+                    this.socket.onmessage = (event) => {
+                        console.log('Received message:', event.data);
+                        const data = JSON.parse(event.data);
+                        console.log('Parsed data:', data);
+                        this.handleMessage(data);
+                    };
+
+                    this.socket.onerror = () => {
+                        this.showStatus('❌ WebSocket connection error', 'error');
+                    };
+
+                    this.socket.onclose = () => {
+                        this.showStatus('🔌 Connection closed', 'error');
+                    };
+
+                    // Get microphone
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            sampleRate: 16000,
+                            channelCount: 1,
+                            echoCancellation: true,
+                            noiseSuppression: true
+                        }
+                    });
+
+                    // Voice activity detection
+                    this.speechEvents = hark(stream, { threshold: -50 });
+                    this.speechEvents.on('speaking', () => {
+                        this.voiceIndicator.classList.add('active');
+                    });
+                    this.speechEvents.on('stopped_speaking', () => {
+                        this.voiceIndicator.classList.remove('active');
+                    });
+
+                    // Audio processing
+                    this.audioContext = new AudioContext({ sampleRate: 16000 });
+                    const source = this.audioContext.createMediaStreamSource(stream);
+                    const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+
+                    processor.onaudioprocess = (e) => {
+                        if (this.isRecording && this.socket && this.socket.readyState === WebSocket.OPEN) {
+                            const inputData = e.inputBuffer.getChannelData(0);
+                            const pcmData = this.float32ToPCM16(inputData);
+                            this.socket.send(pcmData);
+                        }
+                    };
+
+                    source.connect(processor);
+                    processor.connect(this.audioContext.destination);
+
+                    this.isRecording = true;
+                    this.transcriptText = '';
+                    this.recordBtn.textContent = '⏹️ Stop Recording';
+                    this.recordBtn.className = 'stop-btn';
+                    this.transcript.textContent = 'Listening for speech...';
+
+                } catch (error) {
+                    this.showStatus('❌ Error: ' + error.message, 'error');
+                    console.error('Error starting recording:', error);
+                }
+            }
+
+            stopRecording() {
+                this.isRecording = false;
+
+                if (this.socket) {
+                    this.socket.send(JSON.stringify({ type: 'stop' }));
+                    this.socket.close();
+                    this.socket = null;
+                }
+
+                if (this.speechEvents) {
+                    this.speechEvents.stop();
+                    this.speechEvents = null;
+                }
+
+                if (this.audioContext) {
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+
+                this.recordBtn.textContent = '🎤 Start Recording';
+                this.recordBtn.className = 'start-btn';
+                this.voiceIndicator.classList.remove('active');
+                this.showStatus('⏹️ Recording stopped', '');
+            }
+
+            handleMessage(data) {
+                console.log('Handling message:', data);
+
+                switch (data.type) {
+                    case 'transcription':
+                        console.log('Processing transcription:', data);
+                        if (data.text && data.text.trim()) {
+                            if (data.isFinal) {
+                                // Final transcription - add to permanent text
+                                this.transcriptText += data.text + ' ';
+                                this.transcript.innerHTML = this.transcriptText;
+                                console.log(`Final: "${data.text}" (${data.start}ms - ${data.end}ms)`);
+                            } else {
+                                // Partial transcription - show in gray
+                                this.transcript.innerHTML = this.transcriptText +
+                                    '<span style="color: #666; font-style: italic;">' + data.text + '</span>';
+                                console.log(`Partial: "${data.text}"`);
+                            }
+                            this.transcript.scrollTop = this.transcript.scrollHeight;
+                        } else {
+                            console.log('Empty or invalid transcription text:', data.text);
+                        }
+                        break;
+
+                    case 'status':
+                        console.log('Status message:', data.message);
+                        this.showStatus(data.message, 'listening');
+                        break;
+
+                    case 'error':
+                        console.log('Error message:', data.message);
+                        this.showStatus('❌ Error: ' + data.message, 'error');
+                        break;
+
+                    default:
+                        console.log('Unknown message type:', data.type);
+                        break;
+                }
+            }
+
+            float32ToPCM16(float32Array) {
+                const pcm16Array = new Int16Array(float32Array.length);
+                for (let i = 0; i < float32Array.length; i++) {
+                    const sample = Math.max(-1, Math.min(1, float32Array[i]));
+                    pcm16Array[i] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                }
+                return pcm16Array.buffer;
+            }
+
+            showStatus(message, type) {
+                this.status.textContent = message;
+                this.status.className = 'status ' + type;
+                this.status.style.display = message ? 'block' : 'none';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new WhisperClient();
+        });
+    </script>
+</body>
+
+</html>
