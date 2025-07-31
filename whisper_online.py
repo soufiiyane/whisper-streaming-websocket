@@ -116,15 +116,15 @@ class FasterWhisperASR(ASRBase):
 
 
         # this worked fast and reliably on NVIDIA L40
-        model = WhisperModel(model_size_or_path, device="cuda", compute_type="float16", download_root=cache_dir)
+        # model = WhisperModel(model_size_or_path, device="cuda", compute_type="float16", download_root=cache_dir)
 
         # or run on GPU with INT8
         # tested: the transcripts were different, probably worse than with FP16, and it was slightly (appx 20%) slower
-        #model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
+        # model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
 
         # or run on CPU with INT8
         # tested: works, but slow, appx 10-times than cuda FP16
-        # model = WhisperModel(model_size_or_path, device="cpu", compute_type="int8", download_root=cache_dir)
+        model = WhisperModel(model_size_or_path, device="cpu", compute_type="int8", download_root=cache_dir)
         return model
 
     def transcribe(self, audio, init_prompt=""):

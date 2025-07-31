@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whisper Live</title>
+    <title>Whisper Live Transcription & Translation</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,6 +35,32 @@
             flex-wrap: wrap;
         }
 
+        .language-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+
+        .language-controls label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .recording .language-controls {
+            background-color: #e8f5e8;
+            border-color: #4CAF50;
+        }
+
+        .recording .language-controls label {
+            color: #2e7d32;
+        }
+
         button {
             padding: 12px 24px;
             border: none;
@@ -62,6 +88,13 @@
             background-color: #da190b;
         }
 
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
         .status {
             padding: 10px;
             margin: 10px 0;
@@ -81,19 +114,38 @@
             border: 1px solid #f5c6cb;
         }
 
-        .transcript {
-            min-height: 150px;
+        .output-section {
+            margin: 20px 0;
             padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .output-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .transcript,
+        .translation {
+            min-height: 60px;
+            padding: 10px;
             background-color: #f8f9fa;
             border-radius: 5px;
             border: 1px solid #e9ecef;
             font-size: 16px;
             line-height: 1.5;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            margin-top: 20px;
-            max-height: 400px;
+            max-height: 200px;
             overflow-y: auto;
+        }
+
+        .partial {
+            color: #666;
+            font-style: italic;
+        }
+
+        .final {
+            color: #000;
         }
 
         .voice-indicator {
@@ -132,22 +184,113 @@
             font-size: 14px;
             width: 200px;
         }
+
+        .translation-section {
+            display: none;
+        }
+
+        .translation-section.enabled {
+            display: block;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>🎤 Whisper Live Transcription</h1>
+        <h1>🎤 Whisper Live Transcription & Translation</h1>
 
         <div class="controls">
             <button id="recordBtn" class="start-btn">🎤 Start Recording</button>
             <input type="text" id="serverUrl" class="server-input" value="ws://localhost:43007"
                 placeholder="WebSocket URL">
-            <span>Voice: <span class="voice-indicator" id="voiceIndicator"></span></span>
+
+            <div class="language-controls">
+                <label for="sourceLanguageSelect">Speak in:</label>
+                <select id="sourceLanguageSelect">
+                    <option value="auto">Auto Detect</option>
+                    <option value="en" selected>English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ar">Arabic</option>
+                    <option value="ru">Russian</option>
+                    <option value="hi">Hindi</option>
+                    <option value="nl">Dutch</option>
+                    <option value="pl">Polish</option>
+                    <option value="tr">Turkish</option>
+                    <option value="sv">Swedish</option>
+                    <option value="da">Danish</option>
+                    <option value="no">Norwegian</option>
+                    <option value="fi">Finnish</option>
+                    <option value="cs">Czech</option>
+                    <option value="sk">Slovak</option>
+                    <option value="hu">Hungarian</option>
+                    <option value="ro">Romanian</option>
+                    <option value="bg">Bulgarian</option>
+                    <option value="hr">Croatian</option>
+                    <option value="sl">Slovenian</option>
+                    <option value="et">Estonian</option>
+                    <option value="lv">Latvian</option>
+                    <option value="lt">Lithuanian</option>
+                    <option value="uk">Ukrainian</option>
+                </select>
+
+                <span style="margin: 0 10px;" id="translationArrow">→</span>
+
+                <label for="targetLanguageSelect" id="translateLabel">Translate to:</label>
+                <select id="targetLanguageSelect">
+                    <option value="es">Spanish</option>
+                    <option value="en">English</option>
+                    <option value="fr" selected>French</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ar">Arabic</option>
+                    <option value="ru">Russian</option>
+                    <option value="hi">Hindi</option>
+                    <option value="nl">Dutch</option>
+                    <option value="pl">Polish</option>
+                    <option value="tr">Turkish</option>
+                    <option value="sv">Swedish</option>
+                    <option value="da">Danish</option>
+                    <option value="no">Norwegian</option>
+                    <option value="fi">Finnish</option>
+                    <option value="cs">Czech</option>
+                    <option value="sk">Slovak</option>
+                    <option value="hu">Hungarian</option>
+                    <option value="ro">Romanian</option>
+                    <option value="bg">Bulgarian</option>
+                    <option value="hr">Croatian</option>
+                    <option value="sl">Slovenian</option>
+                    <option value="et">Estonian</option>
+                    <option value="lv">Latvian</option>
+                    <option value="lt">Lithuanian</option>
+                    <option value="uk">Ukrainian</option>
+                </select>
+            </div>
+
+            <span>Voice Activity: <span class="voice-indicator" id="voiceIndicator"></span></span>
         </div>
 
         <div id="status" class="status" style="display: none;"></div>
-        <div id="transcript" class="transcript">Click "Start Recording" to begin transcription...</div>
+
+        <div class="output-section">
+            <h3 id="originalLabel">🎯 Original (English)</h3>
+            <div id="transcript" class="transcript">Click "Start Recording" to begin transcription...</div>
+        </div>
+
+        <div class="output-section translation-section" id="translationSection">
+            <h3 id="translationLabel">🌍 Translation (French)</h3>
+            <div id="translation" class="translation">Translation will appear here...</div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/hark@1.2.3/hark.bundle.js"></script>
@@ -159,14 +302,100 @@
                 this.audioContext = null;
                 this.speechEvents = null;
                 this.transcriptText = '';
+                this.translationText = '';
+                this.translationEnabled = false;
 
+                this.initializeElements();
+                this.setupEventListeners();
+                this.checkTranslationSupport();
+            }
+
+            initializeElements() {
                 this.recordBtn = document.getElementById('recordBtn');
                 this.serverUrl = document.getElementById('serverUrl');
+                this.sourceLanguageSelect = document.getElementById('sourceLanguageSelect');
+                this.targetLanguageSelect = document.getElementById('targetLanguageSelect');
                 this.status = document.getElementById('status');
                 this.transcript = document.getElementById('transcript');
+                this.translation = document.getElementById('translation');
                 this.voiceIndicator = document.getElementById('voiceIndicator');
+                this.originalLabel = document.getElementById('originalLabel');
+                this.translationLabel = document.getElementById('translationLabel');
+                this.translationSection = document.getElementById('translationSection');
+                this.translationArrow = document.getElementById('translationArrow');
+                this.translateLabel = document.getElementById('translateLabel');
+            }
 
+            setupEventListeners() {
                 this.recordBtn.addEventListener('click', () => this.toggleRecording());
+
+                // Language change handlers
+                const updateLanguages = () => {
+                    const sourceLanguage = this.sourceLanguageSelect.value;
+                    const targetLanguage = this.targetLanguageSelect.value;
+
+                    // Prevent same language for source and target (except auto)
+                    if (sourceLanguage !== 'auto' && sourceLanguage === targetLanguage) {
+                        this.showStatus('Source and target languages cannot be the same!', 'error');
+                        return;
+                    }
+
+                    // Send language update to server
+                    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                        this.socket.send(JSON.stringify({
+                            type: 'setLanguages',
+                            sourceLanguage: sourceLanguage,
+                            targetLanguage: targetLanguage
+                        }));
+                    }
+
+                    // Update UI labels
+                    this.updateLanguageLabels(sourceLanguage, targetLanguage);
+
+                    // Show feedback when recording is active
+                    if (this.isRecording) {
+                        this.showStatus('🔄 Language settings updated during recording!', 'listening');
+                    }
+                };
+
+                this.sourceLanguageSelect.addEventListener('change', updateLanguages);
+                this.targetLanguageSelect.addEventListener('change', updateLanguages);
+
+                // Set initial languages
+                updateLanguages();
+            }
+
+            async checkTranslationSupport() {
+                // Check if server supports translation by connecting briefly
+                try {
+                    const testSocket = new WebSocket(this.serverUrl.value);
+                    testSocket.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'status' && data.message.includes('Translation: Enabled')) {
+                            this.translationEnabled = true;
+                            this.translationSection.classList.add('enabled');
+                        } else if (data.type === 'status') {
+                            this.translationEnabled = false;
+                            this.translationSection.classList.remove('enabled');
+                            this.hideTranslationControls();
+                        }
+                        testSocket.close();
+                    };
+                    testSocket.onerror = () => {
+                        // Server not available, assume no translation
+                        this.translationEnabled = false;
+                        this.hideTranslationControls();
+                    };
+                } catch (error) {
+                    this.translationEnabled = false;
+                    this.hideTranslationControls();
+                }
+            }
+
+            hideTranslationControls() {
+                this.translationArrow.style.display = 'none';
+                this.translateLabel.style.display = 'none';
+                this.targetLanguageSelect.style.display = 'none';
             }
 
             async toggleRecording() {
@@ -240,9 +469,14 @@
 
                     this.isRecording = true;
                     this.transcriptText = '';
+                    this.translationText = '';
                     this.recordBtn.textContent = '⏹️ Stop Recording';
                     this.recordBtn.className = 'stop-btn';
+                    document.body.classList.add('recording');
                     this.transcript.textContent = 'Listening for speech...';
+                    if (this.translationEnabled) {
+                        this.translation.textContent = 'Translation will appear here...';
+                    }
 
                 } catch (error) {
                     this.showStatus('❌ Error: ' + error.message, 'error');
@@ -271,6 +505,7 @@
 
                 this.recordBtn.textContent = '🎤 Start Recording';
                 this.recordBtn.className = 'start-btn';
+                document.body.classList.remove('recording');
                 this.voiceIndicator.classList.remove('active');
                 this.showStatus('⏹️ Recording stopped', '');
             }
@@ -290,7 +525,7 @@
                             } else {
                                 // Partial transcription - show in gray
                                 this.transcript.innerHTML = this.transcriptText +
-                                    '<span style="color: #666; font-style: italic;">' + data.text + '</span>';
+                                    '<span class="partial">' + data.text + '</span>';
                                 console.log(`Partial: "${data.text}"`);
                             }
                             this.transcript.scrollTop = this.transcript.scrollHeight;
@@ -299,9 +534,49 @@
                         }
                         break;
 
+                    case 'translation':
+                        console.log('Processing translation:', data);
+                        if (data.text && data.text.trim()) {
+                            if (data.isFinal) {
+                                // Final translation - add to permanent text
+                                this.translationText += data.text + ' ';
+                                this.translation.innerHTML = this.translationText;
+                                console.log(`Final translation: "${data.text}"`);
+                            } else {
+                                // Partial translation - show in gray
+                                this.translation.innerHTML = this.translationText +
+                                    '<span class="partial">' + data.text + '</span>';
+                                console.log(`Partial translation: "${data.text}"`);
+                            }
+                            this.translation.scrollTop = this.translation.scrollHeight;
+                        }
+                        break;
+
+                    case 'languageChangeRestart':
+                        console.log('Language change restart:', data.message);
+                        this.showStatus(data.message, 'listening');
+                        // Don't clear previous content - just show status
+                        // Previous transcriptions and translations remain visible
+                        break;
+
+                    case 'targetLanguageChanged':
+                        console.log('Target language changed:', data.message);
+                        this.showStatus(data.message, 'listening');
+                        // Don't clear any content - just update labels if needed
+                        break;
+
                     case 'status':
                         console.log('Status message:', data.message);
                         this.showStatus(data.message, 'listening');
+                        // Check if translation is enabled from status message
+                        if (data.message.includes('Translation: Enabled')) {
+                            this.translationEnabled = true;
+                            this.translationSection.classList.add('enabled');
+                        } else if (data.message.includes('Translation: Disabled')) {
+                            this.translationEnabled = false;
+                            this.translationSection.classList.remove('enabled');
+                            this.hideTranslationControls();
+                        }
                         break;
 
                     case 'error':
@@ -312,6 +587,25 @@
                     default:
                         console.log('Unknown message type:', data.type);
                         break;
+                }
+            }
+
+            updateLanguageLabels(sourceLanguage, targetLanguage) {
+                const languageNames = {
+                    'auto': 'Auto Detect',
+                    'en': 'English', 'es': 'Spanish', 'fr': 'French', 'de': 'German',
+                    'it': 'Italian', 'pt': 'Portuguese', 'ja': 'Japanese', 'ko': 'Korean',
+                    'zh': 'Chinese', 'ar': 'Arabic', 'ru': 'Russian', 'hi': 'Hindi',
+                    'nl': 'Dutch', 'pl': 'Polish', 'tr': 'Turkish', 'sv': 'Swedish',
+                    'da': 'Danish', 'no': 'Norwegian', 'fi': 'Finnish', 'cs': 'Czech',
+                    'sk': 'Slovak', 'hu': 'Hungarian', 'ro': 'Romanian', 'bg': 'Bulgarian',
+                    'hr': 'Croatian', 'sl': 'Slovenian', 'et': 'Estonian', 'lv': 'Latvian',
+                    'lt': 'Lithuanian', 'uk': 'Ukrainian'
+                };
+
+                this.originalLabel.textContent = `🎯 Original (${languageNames[sourceLanguage] || sourceLanguage})`;
+                if (this.translationEnabled) {
+                    this.translationLabel.textContent = `🌍 Translation (${languageNames[targetLanguage] || targetLanguage})`;
                 }
             }
 

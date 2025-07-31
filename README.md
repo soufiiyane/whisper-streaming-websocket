@@ -210,7 +210,63 @@ arecord -f S16_LE -c1 -r 16000 -t raw -D default | nc localhost 43001
 
 - nc is netcat with server's host and port
 
-### With WebSocket, FastAPI and web demo
+### Enhanced WebSocket Server with Translation
+
+The enhanced WebSocket server (`whisper_websocket_server.py`) provides real-time transcription with optional translation capabilities.
+
+#### Quick Start
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Basic transcription only
+python start_whisper.py
+
+# With translation enabled (recommended)
+python start_whisper.py --translate --vac --vad
+
+# Production setup
+python start_whisper.py --host 0.0.0.0 --port 43007 --model large-v3 --translate --vac --vad --chunk-size 0.3
+```
+
+#### Features
+
+- **Real-time transcription** with multiple Whisper backends
+- **Live translation** using Google Translate (optional)
+- **Language switching** during recording
+- **Voice Activity Detection** for optimized processing
+- **Web interface** with language selection controls
+- **Auto language detection** or manual language specification
+
+#### Web Interface
+
+Open `index.html` in your browser or navigate to `http://localhost:43007` when the server is running. The interface provides:
+
+- Language selection dropdowns (source and target)
+- Real-time language switching during recording
+- Separate panels for original transcription and translation
+- Voice activity indicator
+- Status messages and error handling
+
+#### Command Line Options
+
+```bash
+python whisper_websocket_server.py --help
+```
+
+Key options:
+- `--enable-translation`: Enable Google Translate integration
+- `--host 0.0.0.0`: Bind to all network interfaces
+- `--port 43007`: WebSocket server port
+- `--model large-v3`: Whisper model size
+- `--lan auto`: Source language (auto-detect or specific code)
+- `--backend faster-whisper`: Whisper backend
+- `--vac`: Voice Activity Controller (recommended)
+- `--vad`: Voice Activity Detection
+- `--min-chunk-size 0.3`: Audio processing chunk size
+
+### Original WebSocket Demo
 
 Follow https://github.com/QuentinFuxa/whisper_streaming_web . Contributed by @QuentinFuxa.
 
