@@ -1,0 +1,21 @@
+{
+    "name": "Tab Audio Translator - Whisper",
+    "description": "Real-time audio translation from tab audio using Whisper server.",
+    "version": "1",
+    "manifest_version": 3,
+    "minimum_chrome_version": "116",
+    "action": {
+      "default_icon": "icons/not-recording.png"
+    },
+    "side_panel": {
+      "default_path": "sidepanel.html"
+    },
+    "background": {
+      "service_worker": "service-worker.js"
+    },
+    "permissions": ["tabCapture", "offscreen", "sidePanel", "notifications", "contextMenus"],
+    "host_permissions": ["http://localhost:43007/*"],
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self';"
+    }
+  }

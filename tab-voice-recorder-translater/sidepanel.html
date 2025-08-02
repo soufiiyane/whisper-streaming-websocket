@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 100%;
+            min-width: 400px;
+            min-height: 600px;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            background: white;
+            color: #282828;
+            margin: 0;
+            position: relative;
+            border: 1px solid #EAEAEA;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #282828;
+            font-weight: 600;
+        }
+
+        .controls {
+            margin: 15px 0;
+        }
+
+        .language-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+            padding: 12px;
+            background: #EAEAEA;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 11px;
+            text-align: left;
+            border: 1px solid #d0d0d0;
+            overflow-x: auto;
+        }
+
+        .language-controls label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #282828;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .recording .language-controls {
+            background: #e8f5e8;
+            border: 1px solid #4CAF50;
+        }
+
+        .recording .language-controls label {
+            color: #2e7d32;
+        }
+
+        select {
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid #d0d0d0;
+            font-size: 11px;
+            background: white;
+            color: #282828;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .arrow {
+            margin: 0 4px;
+            font-weight: bold;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 12px;
+            border: 1px solid #EAEAEA;
+        }
+
+        .recording {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+
+        .not-recording {
+            background: #e8f5e8;
+            border-color: #4CAF50;
+            color: #2e7d32;
+        }
+
+        .connecting {
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            margin: 8px 4px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-start {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #45a049;
+        }
+
+        .btn-stop {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #da190b;
+        }
+
+        .btn-clear {
+            background: #666;
+            color: white;
+            font-size: 12px;
+            padding: 8px 16px;
+        }
+
+        .btn-clear:hover {
+            background: #555;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .result-section {
+            margin: 12px 0;
+            padding: 12px;
+            background: #EAEAEA;
+            border-radius: 6px;
+            border: 1px solid #d0d0d0;
+        }
+
+        .result-title {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: #282828;
+        }
+
+        .result-text {
+            font-size: 11px;
+            line-height: 1.5;
+            min-height: 45px;
+            max-height: 85px;
+            overflow-y: auto;
+            word-wrap: break-word;
+            color: #282828;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #d0d0d0;
+        }
+
+        .partial {
+            opacity: 0.7;
+            font-style: italic;
+            color: #666;
+        }
+
+        .final {
+            opacity: 1;
+            font-style: normal;
+            color: #282828;
+        }
+
+        .pin-info {
+            margin-top: 12px;
+            font-size: 10px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>🌐 Tab Audio Translator</h2>
+
+        <div class="controls">
+            <div class="language-controls">
+                <label for="sourceLanguageSelect">Speak in:</label>
+                <select id="sourceLanguageSelect">
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="ar">Arabic</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ru">Russian</option>
+                    <option value="hi">Hindi</option>
+                </select>
+
+                <span class="arrow">→</span>
+
+                <label for="targetLanguageSelect">Translate to:</label>
+                <select id="targetLanguageSelect">
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ar">Arabic</option>
+                    <option value="ru">Russian</option>
+                    <option value="hi">Hindi</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="status" class="status not-recording">
+            Ready to translate
+        </div>
+
+        <button id="startBtn" class="btn btn-start">Start Translation</button>
+        <button id="stopBtn" class="btn btn-stop" disabled>Stop Translation</button>
+        <button id="clearBtn" class="btn btn-clear">Clear Text</button>
+
+        <div class="results">
+            <div class="result-section">
+                <div id="originalLabel" class="result-title">🎤 Original (English)</div>
+                <div id="transcription" class="result-text">Waiting for audio...</div>
+            </div>
+
+            <div class="result-section">
+                <div id="translationLabel" class="result-title">🌍 Translation (Spanish)</div>
+                <div id="translation" class="result-text">Waiting for translation...</div>
+            </div>
+        </div>
+
+        <div class="pin-info">
+            💡 Change languages while recording • Side panel stays open while browsing
+        </div>
+    </div>
+
+    <script src="sidepanel.js"></script>
+</body>
+
+</html>
