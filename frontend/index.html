@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper Streaming Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon"><i class="fas fa-microphone"></i></span>
+                    <span class="logo-text">Whisper Streaming WebSocket documentation</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="menu-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="#overview" class="nav-link" onclick="closeMobileMenu()">Overview</a></li>
+                        <li><a href="#installation" class="nav-link" onclick="closeMobileMenu()">Installation</a></li>
+                        <li><a href="#contributing" class="nav-link" onclick="closeMobileMenu()">Contributing</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content">
+                <!-- Table of Contents -->
+                <div class="toc">
+                    <h3>Table of contents</h3>
+                    <ul>
+                        <li><a href="#overview">Overview</a></li>
+                        <li><a href="#demos">Demos</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#installation">Installation</a></li>
+                        <li><a href="#contributing">Contributing</a></li>
+                    </ul>
+                </div>
+
+                <!-- Overview Section -->
+                <section id="overview">
+                    <div class="breadcrumb">
+                        <span>🏠 Home</span>
+                    </div>
+
+                    <p class="intro-text">
+                        This project was achieved using <strong>faster-whisper</strong> technology throughout the entire
+                        Python
+                        codebase, and is implemented in a WebSocket server that enables real-time audio transcription
+                        and translation.
+                    </p>
+
+                    <h1>Whisper Streaming</h1>
+
+                    <p class="description">
+                        <strong>Whisper Streaming</strong> is a <strong>real-time speech-to-text</strong> transcription
+                        and translation system
+                        built on OpenAI's Whisper model with WebSocket support and optional Google Translate
+                        integration.
+                        The system is powered exclusively by <strong>faster-whisper</strong> for optimal performance and
+                        speed.
+                        This project aims to be robust, scalable, and <strong>FAST</strong> for production use.
+                    </p>
+                </section>
+
+                <!-- Demos Section -->
+                <section id="demos">
+                    <h2>Demos</h2>
+
+                    <div class="demo-section" id="realtime-transcription">
+                        <h3>Real-time Whisper Transcription</h3>
+                        <div class="video-container">
+                            <video controls class="demo-video">
+                                <source src="whisper.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+
+                        </div>
+                        <p class="demo-description">
+                            This demo showcases the core WebSocket-based transcription functionality with near-instant
+                            results.
+
+                        </p>
+                        <p class="note">
+                            Please note: In the video, you'll notice the WebSocket connects to an IP address,
+                            this is an AWS EC2 GPU instance where the server was deployed for optimal real-time
+                            performance and
+                            faster processing.
+                        </p>
+                    </div>
+
+                    <div class="demo-section" id="transcription-translation">
+                        <h3>Streaming Transcription with Translation</h3>
+                        <div class="video-container">
+                            <video controls class="demo-video">
+                                <source src="whisper_translation.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <p class="demo-description">
+                            This demo demonstrates the combined transcription and translation capabilities using Google
+                            Translate API.
+                        </p>
+                        <p class="note">
+                            Please note: The processing appears slower in this video because it was running on
+                            a laptop with
+                            CPU-only processing (no GPU). Even with CPU limitations, the system delivers near real-time
+                            performance
+                            with approximately 5-second latency, which is acceptable for CPU-based processing.
+                        </p>
+                    </div>
+
+                    <div class="demo-section" id="chrome-extension">
+                        <h3>Chrome Extension - Tab Audio Capture</h3>
+                        <div class="video-container">
+                            <video controls class="demo-video">
+                                <source src="whisper_chrome.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+
+                        </div>
+                        <p class="demo-description">
+                            The Chrome extension captures audio from any browser tab and provides real-time
+                            transcription and translation in a persistent side panel. Perfect for YouTube videos,
+                            podcasts, and online
+                            meetings works with any audio content playing in your browser tabs.
+                        </p>
+                    </div>
+
+            
+                </section>
+
+                <!-- Features Section -->
+                <section id="features">
+                    <h2>Features</h2>
+                    <ul class="features-list">
+
+                        <li>✅ <strong>Real-time streaming</strong> - WebSocket-based audio streaming with low
+                            latency processing</li>
+                        <li>✅ <strong>Voice Activity Detection</strong> - Optimized processing with VAD/VAC for
+                            better performance</li>
+                        <li>✅ <strong>Live Translation</strong> - Real-time Google Translate integration for
+                            multilingual support</li>
+                        <li>✅ <strong>Chrome Extension</strong> - Capture and translate audio from any browser tab
+                        </li>
+                        <li>✅ <strong>Web Interface</strong> - Browser-based UI with language switching capabilities
+                        </li>
+                    </ul>
+
+                    <p class="additional-info">
+                        <strong>Streaming support:</strong> The application processes audio chunks in real-time as
+                        they arrive.
+                        You don't need to wait for the complete audio to be processed before receiving transcription
+                        results.
+                    </p>
+
+                    <p class="additional-info">
+                        <strong>Faster-Whisper Backend:</strong> Built exclusively with faster-whisper for optimal
+                        performance and speed. This implementation provides the best balance of accuracy and
+                        processing
+                        speed for real-time applications.
+                    </p>
+
+                    <p class="additional-info">
+                        <strong>WebSocket Architecture:</strong> Built on WebSocket protocol for real-time
+                        bidirectional communication
+                        between client and server, enabling live audio streaming and instant results.
+                    </p>
+
+                    <p class="additional-info">
+                        <strong>Voice Activity Detection:</strong> Integrated VAD/VAC reduces processing overhead by
+                        only transcribing
+                        when speech is detected, improving performance and accuracy.
+                    </p>
+
+                    <p class="additional-info">
+                        <strong>Translation Integration:</strong> Optional Google Translate API integration provides
+                        real-time
+                        translation alongside transcription for multilingual applications.
+                    </p>
+
+                    <p class="additional-info">
+                        <strong>Chrome Extension:</strong> Capture audio from any browser tab (YouTube, podcasts,
+                        meetings)
+                        and get live transcription and translation in a persistent side panel.
+                    </p>
+
+                    <p class="additional-info">
+                        <strong>Easy Configuration:</strong> Simple launcher script with extensive command-line
+                        options for
+                        quick setup and customization.
+                    </p>
+
+                    <p class="note">
+                        Please note: This project supports all Whisper-compatible languages and can be easily
+                        extended
+                        with additional features. Contributions and feature suggestions are welcome!
+                    </p>
+                </section>
+
+                <!-- Installation Section -->
+                <section id="installation">
+                    <h2>Installation</h2>
+                    
+                    <h3>Required Dependencies</h3>
+                    <p class="additional-info">Install the core dependencies first:</p>
+                    <pre><code>pip install librosa soundfile websockets</code></pre>
+
+                    <h3>Faster-Whisper Backend (Recommended)</h3>
+                    <p class="additional-info">
+                        Several alternative backends are integrated. The most recommended one is <strong>faster-whisper</strong> 
+                        with GPU support. For optimal performance, GPU acceleration is highly recommended.
+                    </p>
+                    
+                    <h4>CPU Installation</h4>
+                    <pre><code>pip install faster-whisper</code></pre>
+
+                    <h4>GPU Installation (Recommended)</h4>
+                    <p class="additional-info">
+                        For GPU support, follow the faster-whisper instructions for NVIDIA libraries. 
+                        We succeeded with <strong>CUDNN 8.5.0</strong> and <strong>CUDA 11.7</strong>.
+                    </p>
+                    <pre><code>pip install faster-whisper</code></pre>
+                    
+                    <p class="note">
+                        <strong>GPU Configuration:</strong> After installation, navigate to <code>whisper_online.py</code> 
+                        and find the model variable around line 119. Uncomment the GPU model line to enable GPU acceleration.
+                    </p>
+
+                    <h3>Optional Features</h3>
+                    <ul class="features-list">
+                        <li><strong>Voice Activity Detection:</strong> <code>pip install torch torchaudio</code></li>
+                        <li><strong>Translation Support:</strong> <code>pip install requests</code> (for Google Translate integration)</li>
+                    </ul>
+
+                    <h3>Quick Start</h3>
+                    <p class="additional-info">Once installed, start the server with:</p>
+                    <pre><code>python start_whisper.py</code></pre>
+                    <p class="additional-info">Then open <code>index.html</code> in your browser or navigate to <code>http://localhost:43007</code></p>
+                </section>
+
+            
+
+                <!-- Footer -->
+                <footer class="footer">
+                    <p>More info? Check out the project: <a id="contributing" href="https://github.com/soufiiyane/whisper-streaming-websocket"
+                            class="link">GitHub Repository</a></p>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-hidden');
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('mobile-hidden');
+            }
+        }
+
+        // Close menu when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target)) {
+                sidebar.classList.add('mobile-hidden');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('mobile-hidden');
+            } else {
+                sidebar.classList.add('mobile-hidden');
+            }
+        });
+
+        // Initialize mobile menu state
+        window.addEventListener('load', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('mobile-hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
